@@ -1,0 +1,1 @@
+# ArchitectureAndDesignPatterns_HW6_AdapterAndBridge
