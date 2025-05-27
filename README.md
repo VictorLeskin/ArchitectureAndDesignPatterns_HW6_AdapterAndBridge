@@ -1,1 +1,1 @@
-# ArchitectureAndDesignPatterns_HW6_AdapterAndBridge
+# ArchitectureAndDesignPatterns_HW6_AdapterAndBridge - homework #6 of OTUS course
