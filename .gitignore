@@ -399,3 +399,23 @@ FodyWeavers.xsd
 
 # JetBrains Rider
 *.sln.iml
+/CMakeFiles
+/_deps
+/ZERO_CHECK.vcxproj.filters
+/ZERO_CHECK.vcxproj
+/RUN_TESTS.vcxproj.filters
+/RUN_TESTS.vcxproj
+/INSTALL.vcxproj.filters
+/INSTALL.vcxproj
+/CTestTestfile.cmake
+/cmake_install.cmake
+/CMakeCache.txt
+/ArchitectureAndDesignPatterns_HW6_AdapterAndBridge.sln
+/ALL_BUILD.vcxproj.filters
+/ALL_BUILD.vcxproj
+/AdapterAndBridge[1]_tests.cmake
+/AdapterAndBridge[1]_include.cmake
+/AdapterAndBridge.vcxproj.filters
+/AdapterAndBridge.vcxproj
+/AdapterAndBridge[1]_tests.cmake
+/AdapterAndBridge[1]_include.cmake

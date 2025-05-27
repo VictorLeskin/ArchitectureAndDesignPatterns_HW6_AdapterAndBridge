@@ -2,5 +2,3 @@
 
 #include "cgenerateaadapter.hpp"
 
-using namespace ;
-

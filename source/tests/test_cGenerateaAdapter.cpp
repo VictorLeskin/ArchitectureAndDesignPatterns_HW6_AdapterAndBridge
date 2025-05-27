@@ -3,8 +3,8 @@
 #include <gtest/gtest.h>
 
 #include "cgenerateaadapter.hpp"
+#include "ispaceship.hpp"
 
-using namespace ;
 
 // clang-format off
 

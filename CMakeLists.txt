@@ -22,6 +22,8 @@ add_executable(
 
   source/cgenerateaadapter.cpp
   source/cgenerateaadapter.hpp
+  source/cvector.hpp
+  source/ispaceship.hpp
 
   source/tests/test_cGenerateaAdapter.cpp
 )
