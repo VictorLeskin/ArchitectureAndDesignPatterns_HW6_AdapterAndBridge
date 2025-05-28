@@ -20,12 +20,15 @@ enable_testing()
 add_executable(
   AdapterAndBridge
 
-  source/cgenerateaadapter.cpp
-  source/cgenerateaadapter.hpp
+  source/cgenerateadapter.cpp
+  source/cgenerateadapter.hpp
   source/cvector.hpp
   source/ispaceship.hpp
+  source/ccppfunctiondeclarationparser.hpp
+  source/ccppfunctiondeclarationparser.cpp
 
-  source/tests/test_cGenerateaAdapter.cpp
+  source/tests/test_cCppFunctionDeclarationParser.cpp
+  source/tests/test_cGenerateAdapter.cpp
 )
 
 target_include_directories(
