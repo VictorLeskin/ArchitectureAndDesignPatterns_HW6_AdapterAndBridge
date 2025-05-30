@@ -28,9 +28,15 @@ protected:
   void split0(const std::string& s);
 
   void splitParameters();
+  void createDerivedClassFunctionDeclaration();
+
+  std::string createDCFDReturn();
+  std::string createDCFDTailAttributes();
+
 
 protected:
   sParserResult r;
+  sParserResult derived;
 };
 
 #endif //#ifndef CCPPFUNCTIONDECLARATIONPARSER_HPP

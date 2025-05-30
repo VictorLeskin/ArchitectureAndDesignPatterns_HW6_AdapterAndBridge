@@ -2,6 +2,8 @@
 
 #include "ccppfunctiondeclarationparser.hpp"
 #include <regex>
+#include <string>
+#include <sstream>
 
 sParserResult cCppFunctionDeclarationParser::parse(std::string s)
 {
@@ -9,7 +11,11 @@ sParserResult cCppFunctionDeclarationParser::parse(std::string s)
 
   s = processSpaces(s); // remove reduntand spaces 
 
-  return sParserResult();
+  split0(s);
+
+  splitParameters();
+
+  return r;
 }
 
 void cCppFunctionDeclarationParser::split0(const std::string& s)
@@ -30,29 +36,21 @@ void cCppFunctionDeclarationParser::split0(const std::string& s)
 
 void cCppFunctionDeclarationParser::splitParameters()
 {
-  const std::string s = r.sParameters;
-
-  std::regex paramRegex(R"((\w+(?:\s*::\s*\w+|\s*\*\s*|\s*&\s*)*)\s*(\w*)\s*,?)");
-
-  std::string& paramsStr = r.sParameters;
-  if (!paramsStr.empty()) 
+  std::istringstream strm(r.sParameters);
+  std::string s;
+  while (std::getline(strm, s, ','))
   {
-    std::sregex_iterator paramIt(paramsStr.begin(), paramsStr.end(), paramRegex);
-    std::sregex_iterator end;
-
-    while (paramIt != end) 
-    {
-      std::smatch paramMatch = *paramIt;
-      std::string paramType = paramMatch[1].str();
-      std::string paramName = paramMatch[2].str();
-
-      if (!paramType.empty()) 
-        r.parameters.emplace_back(paramType, paramName);
-      ++paramIt;
-    }
+      std::regex nameRegex(R"((.*) (\w+)$)"); 
+      std::smatch matches;
+      if (std::regex_match(s, matches, nameRegex))
+      {
+          std::string paramType = matches[1].str();
+          std::string paramName = matches[2].str();
+          r.parameters.emplace_back(paramType, paramName);
+      }
   }
-
 }
+
 
 std::string cCppFunctionDeclarationParser::processSpaces(std::string s)
 {
@@ -74,4 +72,25 @@ std::string cCppFunctionDeclarationParser::processSpaces(std::string s)
   repl(", ", ",");
 
   return s;
+}
+
+std::string cCppFunctionDeclarationParser::createDCFDReturn()
+{
+    return std::regex_replace(r.sReturn, std::regex(R"(virtual\s*)"), "");
+}
+
+std::string cCppFunctionDeclarationParser::createDCFDTailAttributes()
+{
+    std::string ret = std::regex_replace(r.sTailAttributes, std::regex(R"(\s*=\s*0)"), "");
+    return std::regex_replace(ret, std::regex(R"(\s*;)"), "");
+}
+
+
+void cCppFunctionDeclarationParser::createDerivedClassFunctionDeclaration()
+{
+    derived = r;
+    derived.sReturn = createDCFDReturn();
+    derived.sName = r.sName;
+    derived.parameters = r.parameters;
+    derived.sTailAttributes = createDCFDTailAttributes();
 }
