@@ -8,35 +8,38 @@
 
 struct sParserResult
 {
-  std::string sReturn;
-  std::string sName;
-  std::string sParameters;
-  std::string sTailAttributes;
+	std::string sFunctionDeclaration;
+	std::string sReturn;
+	std::string sName;
+	std::string sParameters;
+	std::string sTailAttributes;
 
-  std::vector<std::pair<std::string, std::string>> parameters; // тип и имя параметра
+	std::vector<std::pair<std::string, std::string>> parameters; // тип и имя параметра
 };
 
 class cCppFunctionDeclarationParser
 {
 public:
-  cCppFunctionDeclarationParser() {}
+	cCppFunctionDeclarationParser() {}
 
-  sParserResult parse( std::string s );
-
-protected:
-  std::string processSpaces(std::string s);
-  void split0(const std::string& s);
-
-  void splitParameters();
-  void createDerivedClassFunctionDeclaration();
-
-  std::string createDCFDReturn();
-  std::string createDCFDTailAttributes();
-
+	sParserResult parse(std::string s);
 
 protected:
-  sParserResult r;
-  sParserResult derived;
+	std::string processSpaces(std::string s);
+	void split0(const std::string& s);
+
+	void splitParameters();
+	void createDerivedClassFunctionDeclaration();
+	void createDCFD() { createDerivedClassFunctionDeclaration(); } // alias
+
+	std::string createDCFDReturn();
+	std::string createDCFDTailAttributes();
+
+	std::string composeDCFD();
+
+protected:
+	sParserResult r;
+	sParserResult derived;
 };
 
 #endif //#ifndef CCPPFUNCTIONDECLARATIONPARSER_HPP

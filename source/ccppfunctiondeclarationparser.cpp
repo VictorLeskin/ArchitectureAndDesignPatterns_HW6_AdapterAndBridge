@@ -7,12 +7,12 @@
 
 sParserResult cCppFunctionDeclarationParser::parse(std::string s)
 {
+  r.sFunctionDeclaration = s;
+
   r = sParserResult();
 
   s = processSpaces(s); // remove reduntand spaces 
-
   split0(s);
-
   splitParameters();
 
   return r;
@@ -86,6 +86,7 @@ std::string cCppFunctionDeclarationParser::createDCFDTailAttributes()
 }
 
 
+
 void cCppFunctionDeclarationParser::createDerivedClassFunctionDeclaration()
 {
     derived = r;
@@ -93,4 +94,25 @@ void cCppFunctionDeclarationParser::createDerivedClassFunctionDeclaration()
     derived.sName = r.sName;
     derived.parameters = r.parameters;
     derived.sTailAttributes = createDCFDTailAttributes();
+
+    derived.sFunctionDeclaration = composeDCFD();
+}
+
+std::string cCppFunctionDeclarationParser::composeDCFD()
+{
+    std::ostringstream strm;
+    strm << derived.sReturn
+        << " " << derived.sName
+        << "(";
+    for( int i = 0; i < derived.parameters.size(); ++i )
+    {
+        const auto& p = derived.parameters[i];
+        if (i != 0) strm << ",";
+        strm << p.first << " " << p.second;
+    }
+    strm << ")"
+        << derived.sTailAttributes
+        << " override";
+
+    return strm.str();
 }

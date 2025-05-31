@@ -21,8 +21,11 @@ public:
     using cCppFunctionDeclarationParser::splitParameters;
     using cCppFunctionDeclarationParser::createDCFDReturn;
     using cCppFunctionDeclarationParser::createDCFDTailAttributes;
+    using cCppFunctionDeclarationParser::createDCFD;
+    using cCppFunctionDeclarationParser::composeDCFD;
 
     using cCppFunctionDeclarationParser::r;
+    using cCppFunctionDeclarationParser::derived;
   };
 
 };
@@ -130,6 +133,37 @@ TEST_F(test_cCppFunctionDeclarationParser, test_createDCFDTailAttributes)
 
         EXPECT_EQ(" const", res);
     }
+}
+TEST_F(test_cCppFunctionDeclarationParser, test_createcreateDCFD)
+{
+    {
+        Test_cCppFunctionDeclarationParser t;
+        std::string decl = "virtual int foo(const std::string& s,  int * ptr, double d)const=0;";
 
+        t.split0(decl);
+        t.splitParameters();
+
+        t.createDCFD();
+
+        EXPECT_EQ( t.derived.sReturn, "int");
+        EXPECT_EQ( t.derived.sName, t.derived.sName);
+        EXPECT_EQ( t.derived.parameters, t.derived.parameters);
+        EXPECT_EQ(t.derived.sTailAttributes, "const");
+    }
 }
 
+TEST_F(test_cCppFunctionDeclarationParser, test_composeDCFD)
+{
+    {
+        Test_cCppFunctionDeclarationParser t;
+        std::string decl = "virtual int foo(const std::string& s,int* ptr,double d)const=0;";
+
+        t.split0(decl);
+        t.splitParameters();
+        t.createDCFD();
+
+        std::string res = t.composeDCFD();
+
+        EXPECT_EQ("int foo(const std::string& s,int* ptr,double d)const override", res);
+    }
+}
