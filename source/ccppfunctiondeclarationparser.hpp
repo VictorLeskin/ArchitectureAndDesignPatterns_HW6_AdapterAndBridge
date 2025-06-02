@@ -24,10 +24,14 @@ public:
 
 	sParserResult parse(std::string s);
 
+	const std::string& ClassName() const { return className; }
+	void setClassName(const std::string& cn) { className = cn; }
+
 protected:
 	std::string processSpaces(std::string s);
 	void split0(const std::string& s);
 
+	
 	void splitParameters();
 	void createDerivedClassFunctionDeclaration();
 	void createDCFD() { createDerivedClassFunctionDeclaration(); } // alias
@@ -36,8 +40,11 @@ protected:
 	std::string createDCFDTailAttributes();
 
 	std::string composeDCFD();
+	std::string composeDerivedClassFunctionBody();
+	std::string composeDCFB() { return composeDerivedClassFunctionBody(); }
 
 protected:
+	std::string className;
 	sParserResult r;
 	sParserResult derived;
 };

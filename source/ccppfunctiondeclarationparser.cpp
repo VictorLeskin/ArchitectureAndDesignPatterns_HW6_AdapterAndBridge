@@ -85,8 +85,6 @@ std::string cCppFunctionDeclarationParser::createDCFDTailAttributes()
     return std::regex_replace(ret, std::regex(R"(\s*;)"), "");
 }
 
-
-
 void cCppFunctionDeclarationParser::createDerivedClassFunctionDeclaration()
 {
     derived = r;
@@ -115,4 +113,9 @@ std::string cCppFunctionDeclarationParser::composeDCFD()
         << " override";
 
     return strm.str();
+}
+
+std::string cCppFunctionDeclarationParser::composeDerivedClassFunctionBody()
+{
+    return std::string();
 }
