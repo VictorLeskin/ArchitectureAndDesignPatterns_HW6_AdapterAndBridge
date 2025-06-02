@@ -115,7 +115,50 @@ std::string cCppFunctionDeclarationParser::composeDCFD()
     return strm.str();
 }
 
+#include <fstream>
+
 std::string cCppFunctionDeclarationParser::composeDerivedClassFunctionBody()
 {
-    return std::string();
+  if (derived.sName.length() >= 3 && derived.sName.substr(0, 3) == "set")
+    return composeDCFB_set();
+  else
+    return composeDCFB_get();
+}
+
+std::string cCppFunctionDeclarationParser::composeDCFB_get() const
+{
+  std::ostringstream strm;
+
+  strm << "{\n";
+  strm << "    return IoC.Resolve<" << derived.sReturn << ">";
+  strm << "(";
+  strm << "\"" << className << "." << derived.sName << "\"" << ",obj";
+  for (int i = 0; i < derived.parameters.size(); ++i)
+    strm << "," << derived.parameters[i].second;
+  strm << ");\n";
+  strm << "}\n";
+
+  //static std::ofstream strm1(R"(c:\tmp\aaaa)");
+  //strm1 << strm.str();
+  //strm1.flush();
+  return strm.str();
+}
+
+std::string cCppFunctionDeclarationParser::composeDCFB_set() const
+{
+  std::ostringstream strm;
+
+  strm << "{\n";
+  strm << "    IoC.Resolve<iCommand>";
+  strm << "(";
+  strm << "\"" << className << "." << derived.sName << "\"" << ",obj";
+  for (int i = 0; i < derived.parameters.size(); ++i)
+    strm << "," << derived.parameters[i].second;
+  strm << ").Execute();\n";
+  strm << "}\n";
+
+  static std::ofstream strm1(R"(c:\tmp\bbb)");
+  strm1 << strm.str();
+  strm1.flush();
+  return strm.str();
 }

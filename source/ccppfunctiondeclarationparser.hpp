@@ -42,6 +42,8 @@ protected:
 	std::string composeDCFD();
 	std::string composeDerivedClassFunctionBody();
 	std::string composeDCFB() { return composeDerivedClassFunctionBody(); }
+	std::string composeDCFB_set() const;
+	std::string composeDCFB_get() const;
 
 protected:
 	std::string className;

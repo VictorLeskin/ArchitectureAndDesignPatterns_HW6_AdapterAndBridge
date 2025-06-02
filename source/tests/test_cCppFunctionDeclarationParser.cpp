@@ -183,10 +183,10 @@ TEST_F(test_cCppFunctionDeclarationParser, test_composeDerivedClassFunctionBody)
         //std::string res0 = t.composeDerivedClassFunctionBody();
         //EXPECT_EQ("int foo(const std::string& s,int* ptr,double d)const override", res0);
 
-        std::string resT=R"()"
-        R"({\n")"
-        R"(    return IoC.Resolve<int>("TestClass.Int", obj);\n")"
-        R"(}\n")";
+        std::string resT = R""""({
+    return IoC.Resolve<int>("TestClass.Int",obj);
+}
+)"""";
         std::string res0 = t.composeDerivedClassFunctionBody();
 
         EXPECT_EQ(resT, res0);
@@ -196,20 +196,19 @@ TEST_F(test_cCppFunctionDeclarationParser, test_composeDerivedClassFunctionBody)
         Test_cCppFunctionDeclarationParser t;
         t.setClassName("TestClass");
 
-        std::string decl = "virtual T &setT(const std::string& s,int* ptr,double d)0;";
+        std::string decl = "virtual T& setT(const std::string& s,int* ptr,double d) = 0;";
 
         t.split0(decl);
         t.splitParameters();
         t.createDCFD();
 
-        std::string resT = R"()"
-            R"({\n")"
-            R"(    return IoC.Resolve<T>("TestClass.setT",obj,s,ptr,d);\n")"
-            R"(}\n")";
+        std::string resT = R""""({
+    IoC.Resolve<iCommand>("TestClass.setT",obj,s,ptr,d).Execute();
+}
+)"""";
+
         std::string res0 = t.composeDerivedClassFunctionBody();
 
         EXPECT_EQ(resT, res0);
-
     }
-
 }
