@@ -26,6 +26,8 @@ add_executable(
   source/ispaceship.hpp
   source/ccppfunctiondeclarationparser.hpp
   source/ccppfunctiondeclarationparser.cpp
+  source/testInterfaceFile.cpp
+  source/testInterfaceFile.hpp
 
   source/tests/test_cCppFunctionDeclarationParser.cpp
   source/tests/test_cGenerateAdapter.cpp

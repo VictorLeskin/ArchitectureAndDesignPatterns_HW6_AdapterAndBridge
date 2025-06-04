@@ -40,6 +40,8 @@ public:
   public:
     // add here members for free access.
     Test_cInterfaceFileReader() : cInterfaceFileReader(tmp_strm) {}
+    Test_cInterfaceFileReader(std::istringstream &strm) : cInterfaceFileReader(strm) {}
+
     using cInterfaceFileReader::cInterfaceFileReader; // delegate constructors
 
     using cInterfaceFileReader::isAdapteeClassDeclaration;
@@ -54,6 +56,8 @@ public:
 
     using cInterfaceFileReader::className;
     using cInterfaceFileReader::virtualFunctions;
+
+    static std::string testInterfaceFile_hpp;
   };
 
 };
@@ -151,4 +155,104 @@ TEST_F(test_cInterfaceFileReader, test_finishClass)
   ASSERT_EQ(t.interfaceClasses[0].Function(0).sFunctionDeclaration, "virtual int func()=0;");
   ASSERT_EQ(t.interfaceClasses[0].Function(1).sFunctionDeclaration, "virtual int func1( double x, const cClass &cl )=0;" );
 }
+
+TEST_F(test_cInterfaceFileReader, test_read)
+{
+  std::istringstream strm(Test_cInterfaceFileReader::testInterfaceFile_hpp);
+  Test_cInterfaceFileReader t(strm);
+
+  t.read();
+
+  ASSERT_EQ(6, t.interfaceClasses.size());
+  EXPECT_EQ("testGenerateAdapter", t.interfaceClasses[0].ClassName());
+  EXPECT_EQ("testInterfaceClass", t.interfaceClasses[1].ClassName());
+  EXPECT_EQ("testAdapterClass", t.interfaceClasses[2].ClassName());
+  EXPECT_EQ("testInterfaceFileReader", t.interfaceClasses[3].ClassName());
+  EXPECT_EQ("testAdapterClassesGenerator", t.interfaceClasses[4].ClassName());
+  EXPECT_EQ("testAdapterClassesSourceFile", t.interfaceClasses[5].ClassName());
+
+  ASSERT_EQ(1, t.interfaceClasses[0].FunctionCount() );
+  ASSERT_EQ(2, t.interfaceClasses[1].FunctionCount());
+  ASSERT_EQ(1, t.interfaceClasses[2].FunctionCount());
+  ASSERT_EQ(9, t.interfaceClasses[3].FunctionCount());
+  ASSERT_EQ(1, t.interfaceClasses[4].FunctionCount());
+  ASSERT_EQ(3, t.interfaceClasses[5].FunctionCount());
+}
+
+std::string test_cInterfaceFileReader::Test_cInterfaceFileReader::testInterfaceFile_hpp(R""""(
+#ifndef CGENERATEADAPTER_HPP
+#define CGENERATEADAPTER_HPP
+
+#include <tuple>
+#include <string>
+
+#include "ccppfunctiondeclarationparser.hpp"
+
+// This class generates adapters from special formatted interface classes.
+// The main function of the class opens a file, looks a interface classes and 
+// generates adapter classes for found interfaces.
+class /*ADAPTED*/ testGenerateAdapter
+{
+public:
+  // return 0  if successful otherwise nonzer and a message
+  virtual std::tuple<int, std::string> main(int argc, const char* argv[]) const = 0;
+};
+
+class /*ADAPTED*/ testInterfaceClass
+{
+public:
+  virtual const std::string& ClassName() const = 0;
+  virtual const sParserResult& Function(int idx) const = 0;
+};
+
+class /*ADAPTED*/ testAdapterClass
+{
+public:
+  virtual std::string ClassName() const = 0;
+};
+
+class /*ADAPTED*/ testInterfaceFileReader
+{
+  virtual  void read() = 0;
+
+  virtual  bool empty() const = 0;
+  virtual  const testInterfaceClass* getClass() const = 0;
+
+protected:
+  virtual bool isAdapteeClassDeclaration(const std::string& s) const = 0;
+  virtual bool isVirtualFunctionDefinition(const std::string& s) const = 0;
+  virtual bool isClosingClassDefinition(const std::string& s) const = 0;
+
+  virtual void startClass(const std::string& s) = 0;
+  virtual void addFunctionDeclaration(const std::string& s) = 0;
+  virtual void finishClass(const std::string& s) = 0;
+};
+
+class /*ADAPTED*/ testAdapterClassesGenerator
+{
+public:
+  virtual testAdapterClass create(const testInterfaceClass&)  const = 0;
+};
+
+class /*ADAPTED*/ testAdapterClassesSourceFile
+{
+public:
+  virtual void write(const testAdapterClass&) = 0;
+
+protected:
+  virtual void open() = 0;
+  virtual void writeHeader() = 0;
+};
+
+#endif //#ifndef CGENERATEADAPTER_HPP
+)"""");
+
+
+
+
+
+
+
+
+
 
