@@ -2,6 +2,7 @@
 
 #include "cgenerateadapter.hpp"
 #include <fstream>
+#include <regex>
 
 std::tuple<int, std::string> cGenerateAdapter::main(int argc, const char* argv[])
 {
@@ -49,7 +50,28 @@ std::tuple<int, std::string> cGenerateAdapter::main(int argc, const char* argv[]
 
 void cInterfaceFileReader::read()
 {
-  throw std::exception("not imiplemented");
+  enum enumState { INIT, COLLECT_VIRTUAL_FUNCTIONS } eState(INIT);
+  std::string s;
+  while( std::getline(strm,s) )
+  { 
+    switch (eState)
+    {
+    case INIT:
+      if (isAdapteeClassDeclaration(s))
+      {
+        startClass(s);
+        eState = COLLECT_VIRTUAL_FUNCTIONS;
+      }
+    case COLLECT_VIRTUAL_FUNCTIONS:
+      if (isVirtualFunctionDefinition(s))
+        addFunctionDeclaration(s);
+      else if( isClosingClassDefinition(s))
+      {
+        eState = INIT;
+        finishClass(s);
+      }
+    }
+  }
 }
 
 cAdapterClass cAdapterClassesGenerator::create(const cInterfaceClass&)
@@ -66,4 +88,63 @@ cAdapterClassesSourceFile::cAdapterClassesSourceFile(int argc, const char* argv[
 void cAdapterClassesSourceFile::write(const cAdapterClass&)
 {
   throw std::exception("not imiplemented");
+}
+
+
+bool cInterfaceFileReader::isAdapteeClassDeclaration(const std::string& s) const 
+{ 
+  // class /*ADAPTED*/ className
+  std::regex r(R"(\s*class\s+/\*ADAPTED\*/\s+\w+\s*)");
+  return std::regex_match(s, r);
+}
+
+bool cInterfaceFileReader::isVirtualFunctionDefinition(const std::string& s) const 
+{ 
+  // should be pure virutal function
+  // virtual return values funcName() = 0;
+  // check "virtual " and "=0;" 
+  std::regex r(R"(\s*virtual\s+[^=]+=\s*0\s*;\s*)");
+  return std::regex_match(s, r);
+}
+bool cInterfaceFileReader::isClosingClassDefinition(const std::string& s) const 
+{ 
+  // '};'
+  std::regex r(R"(\s*\}\s*;\s*)");
+  return std::regex_match(s, r);
+}
+
+void cInterfaceFileReader::startClass(const std::string& s) 
+{ 
+  // gen name
+  std::regex r(R"(\s*class\s+/\*ADAPTED\*/\s+(\w+)\s*)");
+  std::smatch m;
+  std::regex_match(s, m, r);
+
+  if (m.size() != 2)
+    throw(std::exception("Can't get the class name from a class name desription"));
+
+  className = m[1];
+  virtualFunctions.clear();
+}
+
+void cInterfaceFileReader::addFunctionDeclaration(const std::string& s) 
+{ 
+  virtualFunctions.push_back(s);
+}
+
+void cInterfaceFileReader::finishClass( [[maybe_unused]] const std::string& s)
+{
+  cInterfaceClass ic( className, virtualFunctions);
+  interfaceClasses.push_back(ic);
+}
+
+cInterfaceClass::cInterfaceClass(const std::string& className, const std::vector<std::string>& virtualFunctionsDeclarations):
+  className(className)
+{
+  cCppFunctionDeclarationParser parser;
+  for( const auto &sFunc:virtualFunctionsDeclarations )
+  {
+    sParserResult r = parser.parse(sFunc);
+    functions.push_back(r);
+  }
 }

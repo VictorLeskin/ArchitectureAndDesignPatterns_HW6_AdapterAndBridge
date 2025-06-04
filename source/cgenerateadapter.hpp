@@ -20,7 +20,11 @@ public:
 class cInterfaceClass
 {
 public:
-  std::string ClassName() const { return className; }
+  const std::string &ClassName() const { return className; }
+  const sParserResult& Function(int idx) const { return functions[idx]; }
+
+  cInterfaceClass() {}
+  cInterfaceClass(const std::string& className, const std::vector<std::string>& virtualFunctionsDeclarations);
 
 protected:
   std::string className;
@@ -55,10 +59,22 @@ public:
       : nullptr;
   }
 
+  protected:
+    bool isAdapteeClassDeclaration( const std::string &s ) const;
+    bool isVirtualFunctionDefinition( const std::string &s ) const;
+    bool isClosingClassDefinition(const std::string& s) const;
+
+    void startClass(const std::string &s );
+    void addFunctionDeclaration(const std::string &s );
+    void finishClass(const std::string& s);
+
 protected:
   std::istream& strm;
   int interfaceClassesIdx = 0;
   std::vector<cInterfaceClass> interfaceClasses;
+
+  std::string className;
+  std::vector<std::string> virtualFunctions;
 };
 
 class cAdapterClassesGenerator 

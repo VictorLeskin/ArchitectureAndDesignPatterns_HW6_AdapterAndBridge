@@ -7,9 +7,9 @@
 
 sParserResult cCppFunctionDeclarationParser::parse(std::string s)
 {
-  r.sFunctionDeclaration = s;
-
   r = sParserResult();
+
+  r.sFunctionDeclaration = s;
 
   s = processSpaces(s); // remove reduntand spaces 
   split0(s);
