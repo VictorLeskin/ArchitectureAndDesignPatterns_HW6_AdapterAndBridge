@@ -51,7 +51,6 @@ void cCppFunctionDeclarationParser::splitParameters()
   }
 }
 
-
 std::string cCppFunctionDeclarationParser::processSpaces(std::string s)
 {
   // remove extra spaces
@@ -74,18 +73,18 @@ std::string cCppFunctionDeclarationParser::processSpaces(std::string s)
   return s;
 }
 
-std::string cCppFunctionDeclarationParser::createDCFDReturn()
+std::string cAddapterCppFunctionDeclarationTransformer::createDCFDReturn()
 {
-    return std::regex_replace(r.sReturn, std::regex(R"(virtual\s*)"), "");
+    return std::regex_replace(derived.sReturn, std::regex(R"(virtual\s*)"), "");
 }
 
-std::string cCppFunctionDeclarationParser::createDCFDTailAttributes()
+std::string cAddapterCppFunctionDeclarationTransformer::createDCFDTailAttributes()
 {
-    std::string ret = std::regex_replace(r.sTailAttributes, std::regex(R"(\s*=\s*0)"), "");
+    std::string ret = std::regex_replace(derived.sTailAttributes, std::regex(R"(\s*=\s*0)"), "");
     return std::regex_replace(ret, std::regex(R"(\s*;)"), "");
 }
 
-void cCppFunctionDeclarationParser::createDerivedClassFunctionDeclaration()
+void cAddapterCppFunctionDeclarationTransformer::createDerivedClassFunctionDeclaration(const sParserResult& r)
 {
     derived = r;
     derived.sReturn = createDCFDReturn();
@@ -96,7 +95,7 @@ void cCppFunctionDeclarationParser::createDerivedClassFunctionDeclaration()
     derived.sFunctionDeclaration = composeDCFD();
 }
 
-std::string cCppFunctionDeclarationParser::composeDCFD()
+std::string cAddapterCppFunctionDeclarationTransformer::composeDCFD()
 {
     std::ostringstream strm;
     strm << derived.sReturn
@@ -117,7 +116,7 @@ std::string cCppFunctionDeclarationParser::composeDCFD()
 
 #include <fstream>
 
-std::string cCppFunctionDeclarationParser::composeDerivedClassFunctionBody()
+std::string cAddapterCppFunctionDeclarationTransformer::composeDerivedClassFunctionBody()
 {
   if (derived.sName.length() >= 3 && derived.sName.substr(0, 3) == "set")
     return composeDCFB_set();
@@ -125,7 +124,7 @@ std::string cCppFunctionDeclarationParser::composeDerivedClassFunctionBody()
     return composeDCFB_get();
 }
 
-std::string cCppFunctionDeclarationParser::composeDCFB_get() const
+std::string cAddapterCppFunctionDeclarationTransformer::composeDCFB_get() const
 {
   std::ostringstream strm;
 
@@ -144,7 +143,7 @@ std::string cCppFunctionDeclarationParser::composeDCFB_get() const
   return strm.str();
 }
 
-std::string cCppFunctionDeclarationParser::composeDCFB_set() const
+std::string cAddapterCppFunctionDeclarationTransformer::composeDCFB_set() const
 {
   std::ostringstream strm;
 

@@ -26,15 +26,36 @@ public:
 
 	const std::string& ClassName() const { return className; }
 	void setClassName(const std::string& cn) { className = cn; }
+	const sParserResult& ParseResult() const { return r; }
 
 protected:
 	std::string processSpaces(std::string s);
 	void split0(const std::string& s);
-
 	
 	void splitParameters();
-	void createDerivedClassFunctionDeclaration();
-	void createDCFD() { createDerivedClassFunctionDeclaration(); } // alias
+
+protected:
+	std::string className;
+	sParserResult r;
+};
+
+class cAddapterCppFunctionDeclarationTransformer
+{
+public:
+	cAddapterCppFunctionDeclarationTransformer() {}
+
+	sParserResult transform(const sParserResult& r)
+	{
+		createDerivedClassFunctionDeclaration(r);
+	}
+
+	const std::string& ClassName() const { return className; }
+	void setClassName(const std::string& cn) { className = cn; }
+
+
+protected:
+	void createDerivedClassFunctionDeclaration(const sParserResult& r);
+	void createDCFD(const sParserResult& r) { createDerivedClassFunctionDeclaration(r); } // alias
 
 	std::string createDCFDReturn();
 	std::string createDCFDTailAttributes();
@@ -45,10 +66,13 @@ protected:
 	std::string composeDCFB_set() const;
 	std::string composeDCFB_get() const;
 
+
 protected:
 	std::string className;
-	sParserResult r;
 	sParserResult derived;
 };
+
+
+
 
 #endif //#ifndef CCPPFUNCTIONDECLARATIONPARSER_HPP

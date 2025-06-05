@@ -19,17 +19,34 @@ public:
     using cCppFunctionDeclarationParser::processSpaces;
     using cCppFunctionDeclarationParser::split0;
     using cCppFunctionDeclarationParser::splitParameters;
-    using cCppFunctionDeclarationParser::createDCFDReturn;
-    using cCppFunctionDeclarationParser::createDCFDTailAttributes;
-    using cCppFunctionDeclarationParser::createDCFD;
-    using cCppFunctionDeclarationParser::composeDCFD;
-    using cCppFunctionDeclarationParser::composeDerivedClassFunctionBody;
 
     using cCppFunctionDeclarationParser::r;
-    using cCppFunctionDeclarationParser::derived;
   };
 
 };
+
+// gTest grouping class
+class test_cAddapterCppFunctionDeclarationTransformer : public ::testing::Test
+{
+public:
+  // additional class to access to member of tested class
+  class Test_cAddapterCppFunctionDeclarationTransformer : public cAddapterCppFunctionDeclarationTransformer
+  {
+  public:
+    // add here members for free access.
+    using cAddapterCppFunctionDeclarationTransformer::createDCFDReturn;
+    using cAddapterCppFunctionDeclarationTransformer::createDCFDTailAttributes;
+    using cAddapterCppFunctionDeclarationTransformer::createDCFD;
+    using cAddapterCppFunctionDeclarationTransformer::composeDCFD;
+    using cAddapterCppFunctionDeclarationTransformer::composeDerivedClassFunctionBody;
+
+    using cAddapterCppFunctionDeclarationTransformer::derived;
+  };
+
+};
+
+
+
  
 TEST_F(test_cCppFunctionDeclarationParser, test_ctor )
 {
@@ -103,48 +120,49 @@ TEST_F(test_cCppFunctionDeclarationParser, test_splitParameters )
   }
 }
 
-TEST_F(test_cCppFunctionDeclarationParser, test_createDCFDReturn)
+TEST_F(test_cAddapterCppFunctionDeclarationTransformer, test_createDCFDReturn)
 {
     {
-        Test_cCppFunctionDeclarationParser t;
+        Test_cAddapterCppFunctionDeclarationTransformer t;
 
-        t.r.sReturn = " virtual     const std::string &";
+        t.derived.sReturn = " virtual     const std::string &";
         std::string res = t.createDCFDReturn();
 
         EXPECT_EQ(" const std::string &", res );
     }
 }
 
-TEST_F(test_cCppFunctionDeclarationParser, test_createDCFDTailAttributes)
+TEST_F(test_cAddapterCppFunctionDeclarationTransformer, test_createDCFDTailAttributes)
 {
     {
-        Test_cCppFunctionDeclarationParser t;
+        Test_cAddapterCppFunctionDeclarationTransformer t;
 
-        t.r.sTailAttributes = " const  =    0 ;";
+        t.derived.sTailAttributes = " const  =    0 ;";
         std::string res = t.createDCFDTailAttributes();
 
         EXPECT_EQ(" const", res);
     }
 
     {
-        Test_cCppFunctionDeclarationParser t;
+        Test_cAddapterCppFunctionDeclarationTransformer t;
 
-        t.r.sTailAttributes = " const=0;";
+        t.derived.sTailAttributes = " const=0;";
         std::string res = t.createDCFDTailAttributes();
 
         EXPECT_EQ(" const", res);
     }
 }
-TEST_F(test_cCppFunctionDeclarationParser, test_createcreateDCFD)
+TEST_F(test_cAddapterCppFunctionDeclarationTransformer, test_createcreateDCFD)
 {
     {
-        Test_cCppFunctionDeclarationParser t;
+        test_cCppFunctionDeclarationParser::Test_cCppFunctionDeclarationParser t0;
+        Test_cAddapterCppFunctionDeclarationTransformer t;
         std::string decl = "virtual int foo(const std::string& s,  int * ptr, double d)const=0;";
 
-        t.split0(decl);
-        t.splitParameters();
+        t0.split0(decl);
+        t0.splitParameters();
 
-        t.createDCFD();
+        t.createDCFD(t0.ParseResult());
 
         EXPECT_EQ( t.derived.sReturn, "int");
         EXPECT_EQ( t.derived.sName, t.derived.sName);
@@ -153,15 +171,16 @@ TEST_F(test_cCppFunctionDeclarationParser, test_createcreateDCFD)
     }
 }
 
-TEST_F(test_cCppFunctionDeclarationParser, test_composeDCFD)
+TEST_F(test_cAddapterCppFunctionDeclarationTransformer, test_composeDCFD)
 {
     {
-        Test_cCppFunctionDeclarationParser t;
+        test_cCppFunctionDeclarationParser::Test_cCppFunctionDeclarationParser t0;
+        Test_cAddapterCppFunctionDeclarationTransformer t;
         std::string decl = "virtual int foo(const std::string& s,int* ptr,double d)const=0;";
 
-        t.split0(decl);
-        t.splitParameters();
-        t.createDCFD();
+        t0.split0(decl);
+        t0.splitParameters();
+        t.createDCFD(t0.ParseResult());
 
         std::string res = t.composeDCFD();
 
@@ -169,16 +188,18 @@ TEST_F(test_cCppFunctionDeclarationParser, test_composeDCFD)
     }
 }
 
-TEST_F(test_cCppFunctionDeclarationParser, test_composeDerivedClassFunctionBody)
+TEST_F(test_cAddapterCppFunctionDeclarationTransformer, test_composeDerivedClassFunctionBody)
 {
     {
-        Test_cCppFunctionDeclarationParser t;
-        t.setClassName("TestClass");
+        test_cCppFunctionDeclarationParser::Test_cCppFunctionDeclarationParser t0;
+        Test_cAddapterCppFunctionDeclarationTransformer t;
+        t0.setClassName("TestClass");
         std::string decl = "virtual int Int()const=0;";
 
-        t.split0(decl);
-        t.splitParameters();
-        t.createDCFD();
+        t0.split0(decl);
+        t0.splitParameters();
+        t.setClassName("TestClass");
+        t.createDCFD(t0.ParseResult());
 
         //std::string res0 = t.composeDerivedClassFunctionBody();
         //EXPECT_EQ("int foo(const std::string& s,int* ptr,double d)const override", res0);
@@ -193,14 +214,16 @@ TEST_F(test_cCppFunctionDeclarationParser, test_composeDerivedClassFunctionBody)
     }
 
     {
-        Test_cCppFunctionDeclarationParser t;
-        t.setClassName("TestClass");
+        test_cCppFunctionDeclarationParser::Test_cCppFunctionDeclarationParser t0;
+        Test_cAddapterCppFunctionDeclarationTransformer t;
+        t0.setClassName("TestClass");
 
         std::string decl = "virtual T& setT(const std::string& s,int* ptr,double d) = 0;";
 
-        t.split0(decl);
-        t.splitParameters();
-        t.createDCFD();
+        t0.split0(decl);
+        t0.splitParameters();
+        t.setClassName("TestClass");
+        t.createDCFD(t0.ParseResult());
 
         std::string resT = R""""({
     IoC.Resolve<iCommand>("TestClass.setT",obj,s,ptr,d).Execute();
