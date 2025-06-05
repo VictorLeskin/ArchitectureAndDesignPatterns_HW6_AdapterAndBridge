@@ -26,12 +26,12 @@ std::tuple<int, std::string> cGenerateAdapter::main(int argc, const char* argv[]
       {
         while (auto iClass = ifr.getClass())
         {
-          auto ic = acg.create(*iClass);
-          acsf.write(ic);
+          auto ac = acg.create(*iClass);
+          acsf.write(ac);
 
           // init report string or add comma to separate class names
           report = (report == "") ? std::string("Generated adapter for classes: ") : (report + ", ");
-          report += ic.ClassName();
+          report += ac.ClassName();
         }
       }
       else
@@ -74,10 +74,9 @@ void cInterfaceFileReader::read()
   }
 }
 
-cAdapterClass cAdapterClassesGenerator::create(const cInterfaceClass&)
+cAdapterClass cAdapterClassesGenerator::create(const cInterfaceClass& ic)
 {
-  throw std::exception("not imiplemented");
-  return cAdapterClass();
+  return cAdapterClass(ic);
 }
 
 cAdapterClassesSourceFile::cAdapterClassesSourceFile(int argc, const char* argv[])
@@ -147,4 +146,13 @@ cInterfaceClass::cInterfaceClass(const std::string& className, const std::vector
     sParserResult r = parser.parse(sFunc);
     functions.push_back(r);
   }
+}
+
+inline cAdapterClass::cAdapterClass(const cInterfaceClass& ic) : interfaceClass(&ic)
+{
+  create();
+}
+
+void cAdapterClass::create()
+{
 }

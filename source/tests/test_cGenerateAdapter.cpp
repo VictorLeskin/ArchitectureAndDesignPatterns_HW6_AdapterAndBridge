@@ -62,6 +62,35 @@ public:
 
 };
 
+
+// gTest grouping class
+class test_cAdapterClassesGenerator : public ::testing::Test
+{
+public:
+  // additional class to access to member of tested class
+  class Test_cAdapterClassesGenerator : public cAdapterClassesGenerator
+  {
+  public:
+    // add here members for free access.
+    using cAdapterClassesGenerator::cAdapterClassesGenerator; // delegate constructors
+  };
+
+};
+
+TEST_F(test_cAdapterClassesGenerator, test_create)
+{
+
+  std::string t0("TestClass");
+  std::vector<std::string> t1({
+  "virtual void write(const testAdapterClass&) = 0;",
+  "virtual void open() = 0;",
+  "virtual void writeHeader() = 0;" });
+  cInterfaceClass p0(t0, t1);
+
+  Test_cAdapterClassesGenerator t;
+  cAdapterClass r = t.create( p0 );
+}
+
 TEST_F(test_cInterfaceFileReader, test_isAdapteeClassDeclaration)
 {
   Test_cInterfaceFileReader t;
@@ -178,6 +207,30 @@ TEST_F(test_cInterfaceFileReader, test_read)
   ASSERT_EQ(1, t.interfaceClasses[4].FunctionCount());
   ASSERT_EQ(3, t.interfaceClasses[5].FunctionCount());
 }
+
+TEST_F(test_cInterfaceFileReader, test_empty)
+{
+  Test_cInterfaceFileReader t;
+  EXPECT_EQ(true, t.empty());
+  t.interfaceClasses.push_back(cInterfaceClass("className", std::vector<std::string>({"virtual void write(const testAdapterClass&) = 0"})));
+  EXPECT_EQ(false, t.empty());
+}
+
+TEST_F(test_cInterfaceFileReader, test_getClass)
+{
+  {
+    Test_cInterfaceFileReader t;
+    EXPECT_EQ(nullptr, t.getClass());
+  }
+
+  {
+    Test_cInterfaceFileReader t;
+    t.interfaceClasses.push_back(cInterfaceClass("className", std::vector<std::string>({ "virtual void write(const testAdapterClass&) = 0" })));
+    EXPECT_EQ( &t.interfaceClasses[0], t.getClass());
+    EXPECT_EQ(nullptr, t.getClass());
+  }
+}
+
 
 std::string test_cInterfaceFileReader::Test_cInterfaceFileReader::testInterfaceFile_hpp(R""""(
 #ifndef CGENERATEADAPTER_HPP

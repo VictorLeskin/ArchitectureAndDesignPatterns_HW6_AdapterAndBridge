@@ -22,7 +22,7 @@ class cInterfaceClass
 public:
   const std::string &ClassName() const { return className; }
   const sParserResult& Function(int idx) const { return functions[idx]; }
-  int FunctionCount() const { return functions.size(); }
+  int FunctionCount() const { return int(functions.size()); }
 
   cInterfaceClass() {}
   cInterfaceClass(const std::string& className, const std::vector<std::string>& virtualFunctionsDeclarations);
@@ -35,10 +35,15 @@ protected:
 class cAdapterClass
 {
 public:
+  cAdapterClass(const cInterfaceClass& ic);
+
   std::string ClassName() const { return interfaceClass->ClassName();  }
 
 protected:
-  cInterfaceClass* interfaceClass;
+  void create();
+
+protected:
+  const cInterfaceClass* interfaceClass;
 };
 
 class cInterfaceFileReader
@@ -61,13 +66,13 @@ public:
   }
 
   protected:
-    bool isAdapteeClassDeclaration( const std::string &s ) const;
-    bool isVirtualFunctionDefinition( const std::string &s ) const;
-    bool isClosingClassDefinition(const std::string& s) const;
+  bool isAdapteeClassDeclaration( const std::string &s ) const;
+  bool isVirtualFunctionDefinition( const std::string &s ) const;
+  bool isClosingClassDefinition(const std::string& s) const;
 
-    void startClass(const std::string &s );
-    void addFunctionDeclaration(const std::string &s );
-    void finishClass(const std::string& s);
+  void startClass(const std::string &s );
+  void addFunctionDeclaration(const std::string &s );
+  void finishClass(const std::string& s);
 
 protected:
   std::istream& strm;
