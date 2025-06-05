@@ -79,7 +79,6 @@ public:
 
 TEST_F(test_cAdapterClassesGenerator, test_create)
 {
-
   std::string t0("TestClass");
   std::vector<std::string> t1({
   "virtual void write(const testAdapterClass&) = 0;",

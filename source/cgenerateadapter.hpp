@@ -23,6 +23,7 @@ public:
   const std::string &ClassName() const { return className; }
   const sParserResult& Function(int idx) const { return functions[idx]; }
   int FunctionCount() const { return int(functions.size()); }
+  const std::vector<sParserResult> &Functions() const { return functions; }
 
   cInterfaceClass() {}
   cInterfaceClass(const std::string& className, const std::vector<std::string>& virtualFunctionsDeclarations);

@@ -155,4 +155,11 @@ inline cAdapterClass::cAdapterClass(const cInterfaceClass& ic) : interfaceClass(
 
 void cAdapterClass::create()
 {
+  for (const auto& f : interfaceClass->Functions())
+  {
+    cCppFunctionDeclarationParser parser;
+    sParserResult r = parser.parse(f.sFunctionDeclaration);
+    printf("bingo");
+  }
+
 }
