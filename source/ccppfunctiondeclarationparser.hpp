@@ -47,6 +47,7 @@ public:
 	sParserResult transform(const sParserResult& r)
 	{
 		createDerivedClassFunctionDeclaration(r);
+		return derived;
 	}
 
 	const std::string& ClassName() const { return className; }

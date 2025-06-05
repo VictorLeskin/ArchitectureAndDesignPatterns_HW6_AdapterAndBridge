@@ -38,13 +38,8 @@ class cAdapterClass
 public:
   cAdapterClass(const cInterfaceClass& ic);
 
-  std::string ClassName() const { return interfaceClass->ClassName();  }
-
 protected:
-  void create();
-
-protected:
-  const cInterfaceClass* interfaceClass;
+  std::string transformClassName(std::string InterfaceClassName) { return InterfaceClassName; }
 };
 
 class cInterfaceFileReader

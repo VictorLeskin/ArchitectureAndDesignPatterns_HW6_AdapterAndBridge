@@ -31,7 +31,7 @@ std::tuple<int, std::string> cGenerateAdapter::main(int argc, const char* argv[]
 
           // init report string or add comma to separate class names
           report = (report == "") ? std::string("Generated adapter for classes: ") : (report + ", ");
-          report += ac.ClassName();
+          report += iClass->ClassName();
         }
       }
       else
@@ -148,19 +148,13 @@ cInterfaceClass::cInterfaceClass(const std::string& className, const std::vector
   }
 }
 
-inline cAdapterClass::cAdapterClass(const cInterfaceClass& ic) : interfaceClass(&ic)
+cAdapterClass::cAdapterClass(const cInterfaceClass& ic)
 {
-  create();
-}
-
-void cAdapterClass::create()
-{
-  for (const auto& f : interfaceClass->Functions())
+  cAddapterCppFunctionDeclarationTransformer t;
+  t.setClassName(transformClassName(ic.ClassName()));
+  for (const auto& f : ic.Functions())
   {
-    
-    cCppFunctionDeclarationParser parser;
-    sParserResult r = parser.parse(f.sFunctionDeclaration);
+    sParserResult r = t.transform(f);
     printf("bingo");
   }
-
 }
