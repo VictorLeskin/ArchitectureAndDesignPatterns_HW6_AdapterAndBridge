@@ -4,7 +4,13 @@
 
 #include <string>
 #include <vector>
+#include <memory>
 #include "cexception.hpp"
+
+
+class cInterfaceClass;
+class cAdapterClass;
+
 
 struct sParserResult
 {
@@ -15,6 +21,17 @@ struct sParserResult
 	std::string sTailAttributes;
 
 	std::vector<std::pair<std::string, std::string>> parameters; // тип и имя параметра
+};
+
+struct sDerivedClassFunction : public sParserResult
+{
+	std::string tBody;
+	std::string Body() const
+	{
+		return   std::string("{\n")
+				+ std::string("    ") + tBody
+				+ std::string("}\n");
+	}
 };
 
 class cCppFunctionDeclarationParser
@@ -44,17 +61,13 @@ class cAddapterCppFunctionDeclarationTransformer
 public:
 	cAddapterCppFunctionDeclarationTransformer() {}
 
-	sParserResult transform(const sParserResult& r)
-	{
-		createDerivedClassFunctionDeclaration(r);
-		return derived;
-	}
-
-	const std::string& ClassName() const { return className; }
-	void setClassName(const std::string& cn) { className = cn; }
-
+	std::shared_ptr<cAdapterClass> createAdapterClass(const cInterfaceClass* ic) const;
 
 protected:
+	void setClassName(const std::string&) const;
+	std::string createClassName(const std::string &) const;
+	sDerivedClassFunction createDerivedClassFunction(const sParserResult &) const;
+
 	void createDerivedClassFunctionDeclaration(const sParserResult& r);
 	void createDCFD(const sParserResult& r) { createDerivedClassFunctionDeclaration(r); } // alias
 
@@ -69,7 +82,7 @@ protected:
 
 
 protected:
-	std::string className;
+	mutable std::string className;
 	sParserResult derived;
 };
 

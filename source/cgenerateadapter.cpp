@@ -2,6 +2,7 @@
 
 #include "cgenerateadapter.hpp"
 #include <fstream>
+#include <sstream>
 #include <regex>
 
 std::tuple<int, std::string> cGenerateAdapter::main(int argc, const char* argv[])
@@ -15,7 +16,7 @@ std::tuple<int, std::string> cGenerateAdapter::main(int argc, const char* argv[]
   if( false == strm.fail() )
   {
     cInterfaceFileReader ifr(strm);
-    cAdapterClassesGenerator acg;
+    cAddapterCppFunctionDeclarationTransformer acg;
     cAdapterClassesSourceFile acsf(argc, argv);
 
     try
@@ -26,8 +27,8 @@ std::tuple<int, std::string> cGenerateAdapter::main(int argc, const char* argv[]
       {
         while (auto iClass = ifr.getClass())
         {
-          auto ac = acg.create(*iClass);
-          acsf.write(ac);
+          auto ac = acg.createAdapterClass(iClass);
+          acsf.write(*ac);
 
           // init report string or add comma to separate class names
           report = (report == "") ? std::string("Generated adapter for classes: ") : (report + ", ");
@@ -72,11 +73,6 @@ void cInterfaceFileReader::read()
       }
     }
   }
-}
-
-cAdapterClass cAdapterClassesGenerator::create(const cInterfaceClass& ic)
-{
-  return cAdapterClass(ic);
 }
 
 cAdapterClassesSourceFile::cAdapterClassesSourceFile(int argc, const char* argv[])
@@ -148,13 +144,20 @@ cInterfaceClass::cInterfaceClass(const std::string& className, const std::vector
   }
 }
 
-cAdapterClass::cAdapterClass(const cInterfaceClass& ic)
-{
-  cAddapterCppFunctionDeclarationTransformer t;
-  t.setClassName(transformClassName(ic.ClassName()));
-  for (const auto& f : ic.Functions())
-  {
-    sParserResult r = t.transform(f);
-    printf("bingo");
-  }
+std::string cAdapterClass::ToStr() const
+{ 
+    std::ostringstream strm;
+    strm << "class " << className << " : public " << interfaceClassName << std::endl;
+    strm << "{" << std::endl;
+    for( const auto f: functions )
+    {
+        strm << "  " << f.sFunctionDeclaration << std::endl;
+        strm << "  " << "{" << std::endl;
+        strm << "  " << "  " << f.tBody << std::endl;
+        strm << "  " << "}" << std::endl;
+    }
+    strm << "}" << std::endl;
+
+
+    return strm.str();
 }

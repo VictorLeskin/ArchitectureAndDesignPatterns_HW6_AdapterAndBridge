@@ -36,10 +36,17 @@ protected:
 class cAdapterClass
 {
 public:
-  cAdapterClass(const cInterfaceClass& ic);
+  cAdapterClass(const std::string interfaceClassName, const std::string className,
+    const std::vector<sDerivedClassFunction> &functions ) : interfaceClassName(interfaceClassName), className(className), functions(functions)
+  { }
+
+  std::string ToStr() const;
+    
 
 protected:
-  std::string transformClassName(std::string InterfaceClassName) { return InterfaceClassName; }
+    std::string interfaceClassName;
+    std::string className;
+    std::vector<sDerivedClassFunction> functions;
 };
 
 class cInterfaceFileReader
@@ -77,12 +84,6 @@ protected:
 
   std::string className;
   std::vector<std::string> virtualFunctions;
-};
-
-class cAdapterClassesGenerator 
-{
-public:
-  cAdapterClass create(const cInterfaceClass&);
 };
 
 class cAdapterClassesSourceFile

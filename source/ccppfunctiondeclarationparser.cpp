@@ -1,9 +1,11 @@
 ///************************* ITELMA SP ****************************************
 
 #include "ccppfunctiondeclarationparser.hpp"
+#include "cgenerateadapter.hpp"
 #include <regex>
 #include <string>
 #include <sstream>
+#include <cctype>
 
 sParserResult cCppFunctionDeclarationParser::parse(std::string s)
 {
@@ -84,6 +86,7 @@ std::string cAddapterCppFunctionDeclarationTransformer::createDCFDTailAttributes
     return std::regex_replace(ret, std::regex(R"(\s*;)"), "");
 }
 
+
 void cAddapterCppFunctionDeclarationTransformer::createDerivedClassFunctionDeclaration(const sParserResult& r)
 {
     derived = r;
@@ -114,11 +117,10 @@ std::string cAddapterCppFunctionDeclarationTransformer::composeDCFD()
     return strm.str();
 }
 
-#include <fstream>
 
 std::string cAddapterCppFunctionDeclarationTransformer::composeDerivedClassFunctionBody()
 {
-  if (derived.sName.length() >= 3 && derived.sName.substr(0, 3) == "set")
+  if (derived.sName.length() >= 1 && std::islower(derived.sName[0]))
     return composeDCFB_set();
   else
     return composeDCFB_get();
@@ -128,18 +130,13 @@ std::string cAddapterCppFunctionDeclarationTransformer::composeDCFB_get() const
 {
   std::ostringstream strm;
 
-  strm << "{\n";
-  strm << "    return IoC.Resolve<" << derived.sReturn << ">";
+  strm << "return IoC.Resolve<" << derived.sReturn << ">";
   strm << "(";
   strm << "\"" << className << "." << derived.sName << "\"" << ",obj";
   for (int i = 0; i < derived.parameters.size(); ++i)
     strm << "," << derived.parameters[i].second;
   strm << ");\n";
-  strm << "}\n";
 
-  //static std::ofstream strm1(R"(c:\tmp\aaaa)");
-  //strm1 << strm.str();
-  //strm1.flush();
   return strm.str();
 }
 
@@ -147,17 +144,45 @@ std::string cAddapterCppFunctionDeclarationTransformer::composeDCFB_set() const
 {
   std::ostringstream strm;
 
-  strm << "{\n";
-  strm << "    IoC.Resolve<iCommand>";
+  strm << "IoC.Resolve<iCommand>";
   strm << "(";
   strm << "\"" << className << "." << derived.sName << "\"" << ",obj";
   for (int i = 0; i < derived.parameters.size(); ++i)
     strm << "," << derived.parameters[i].second;
   strm << ").Execute();\n";
-  strm << "}\n";
-
-  static std::ofstream strm1(R"(c:\tmp\bbb)");
-  strm1 << strm.str();
-  strm1.flush();
   return strm.str();
 }
+
+std::shared_ptr<cAdapterClass>  cAddapterCppFunctionDeclarationTransformer::createAdapterClass(const cInterfaceClass* ic) const
+{
+    std::string className = createClassName(ic->ClassName());
+    setClassName(className);
+    std::vector<sDerivedClassFunction> functions;
+
+    for (const auto& f : ic->Functions())
+    {
+        sDerivedClassFunction t1 = createDerivedClassFunction(f);
+        functions.push_back(t1);
+    }
+    return std::shared_ptr<cAdapterClass>( new cAdapterClass(ic->ClassName(), className, functions ) );
+}
+
+void cAddapterCppFunctionDeclarationTransformer::setClassName(const std::string& c) const
+{
+    className = c;
+}
+
+std::string cAddapterCppFunctionDeclarationTransformer::createClassName(const std::string &adapteeClassName ) const
+{
+    return std::string( "cAdapter_") + adapteeClassName;
+}
+
+sDerivedClassFunction cAddapterCppFunctionDeclarationTransformer::createDerivedClassFunction(const sParserResult &r) const
+{
+    sDerivedClassFunction ret;
+    const_cast<cAddapterCppFunctionDeclarationTransformer*>(this)->createDCFD(r);
+    static_cast<sParserResult&>(ret) = derived;
+    ret.tBody = const_cast<cAddapterCppFunctionDeclarationTransformer*>(this)->composeDCFB();
+    return ret;
+}
+

@@ -62,34 +62,6 @@ public:
 
 };
 
-
-// gTest grouping class
-class test_cAdapterClassesGenerator : public ::testing::Test
-{
-public:
-  // additional class to access to member of tested class
-  class Test_cAdapterClassesGenerator : public cAdapterClassesGenerator
-  {
-  public:
-    // add here members for free access.
-    using cAdapterClassesGenerator::cAdapterClassesGenerator; // delegate constructors
-  };
-
-};
-
-TEST_F(test_cAdapterClassesGenerator, test_create)
-{
-  std::string t0("TestClass");
-  std::vector<std::string> t1({
-  "virtual void write(const testAdapterClass&) = 0;",
-  "virtual void open() = 0;",
-  "virtual void writeHeader() = 0;" });
-  cInterfaceClass p0(t0, t1);
-
-  Test_cAdapterClassesGenerator t;
-  cAdapterClass r = t.create( p0 );
-}
-
 TEST_F(test_cInterfaceFileReader, test_isAdapteeClassDeclaration)
 {
   Test_cInterfaceFileReader t;
@@ -101,9 +73,7 @@ TEST_F(test_cInterfaceFileReader, test_isAdapteeClassDeclaration)
   EXPECT_FALSE(t.isAdapteeClassDeclaration(std::string("   class    /*ADAPTED */ \t cAdaptee  ")));
   EXPECT_FALSE(t.isAdapteeClassDeclaration(std::string("    struct /*ADAPTED*/ \t cAdaptee ")));
   EXPECT_FALSE(t.isAdapteeClassDeclaration(std::string("not a class /*ADAPTED*/ \t cAdaptee  ")));
-
 }
-
 
 TEST_F(test_cInterfaceFileReader, test_isVirtualFunctionDefinition)
 {

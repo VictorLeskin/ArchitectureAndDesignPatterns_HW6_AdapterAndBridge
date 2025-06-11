@@ -3,6 +3,8 @@
 #include <gtest/gtest.h>
 
 #include "ccppfunctiondeclarationparser.hpp"
+#include "cgenerateadapter.hpp"
+#include <fstream>
 
 // clang-format off
 
@@ -39,6 +41,7 @@ public:
     using cAddapterCppFunctionDeclarationTransformer::createDCFD;
     using cAddapterCppFunctionDeclarationTransformer::composeDCFD;
     using cAddapterCppFunctionDeclarationTransformer::composeDerivedClassFunctionBody;
+    using cAddapterCppFunctionDeclarationTransformer::setClassName;
 
     using cAddapterCppFunctionDeclarationTransformer::derived;
   };
@@ -188,6 +191,25 @@ TEST_F(test_cAddapterCppFunctionDeclarationTransformer, test_composeDCFD)
     }
 }
 
+
+TEST_F(test_cAddapterCppFunctionDeclarationTransformer, test_createAdapterClass)
+{
+    Test_cAddapterCppFunctionDeclarationTransformer t;
+    std::string t0("iTestClass");
+    std::vector<std::string> t1({
+    "virtual void write(const testAdapterClass&) = 0;",
+    "virtual void open() = 0;",
+    "virtual int32 DoorTo(int portalIdx) const = 0;",
+    "virtual void writeHeader() = 0;" });
+    cInterfaceClass p0(t0, t1);
+
+    auto r = t.createAdapterClass(&p0);
+
+    std::ofstream("Adapter")  << r->ToStr() << std::endl;
+}
+
+
+
 TEST_F(test_cAddapterCppFunctionDeclarationTransformer, test_composeDerivedClassFunctionBody)
 {
     {
@@ -204,9 +226,7 @@ TEST_F(test_cAddapterCppFunctionDeclarationTransformer, test_composeDerivedClass
         //std::string res0 = t.composeDerivedClassFunctionBody();
         //EXPECT_EQ("int foo(const std::string& s,int* ptr,double d)const override", res0);
 
-        std::string resT = R""""({
-    return IoC.Resolve<int>("TestClass.Int",obj);
-}
+        std::string resT = R""""(return IoC.Resolve<int>("TestClass.Int",obj);
 )"""";
         std::string res0 = t.composeDerivedClassFunctionBody();
 
@@ -225,9 +245,7 @@ TEST_F(test_cAddapterCppFunctionDeclarationTransformer, test_composeDerivedClass
         t.setClassName("TestClass");
         t.createDCFD(t0.ParseResult());
 
-        std::string resT = R""""({
-    IoC.Resolve<iCommand>("TestClass.setT",obj,s,ptr,d).Execute();
-}
+        std::string resT = R""""(IoC.Resolve<iCommand>("TestClass.setT",obj,s,ptr,d).Execute();
 )"""";
 
         std::string res0 = t.composeDerivedClassFunctionBody();

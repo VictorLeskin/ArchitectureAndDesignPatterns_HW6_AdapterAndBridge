@@ -9,6 +9,9 @@
 // This class generates adapters from special formatted interface classes.
 // The main function of the class opens a file, looks a interface classes and 
 // generates adapter classes for found interfaces.
+// if class definition contains /*ADAPTED*/ between 'class' and class name this class is adaptee
+// fuction starting with uppercase return part of state of class
+// function starting with lowercase are actor and will be adapted by execution of a command so they return 'void'
 class /*ADAPTED*/ testGenerateAdapter
 {
 public:
@@ -33,13 +36,13 @@ class /*ADAPTED*/ testInterfaceFileReader
 {
   virtual  void read() = 0;
 
-  virtual  bool empty() const = 0;
-  virtual  const testInterfaceClass* getClass() const = 0;
+  virtual  bool IsEmpty() const = 0;
+  virtual  const testInterfaceClass* Class() const = 0;
 
 protected:
-  virtual bool isAdapteeClassDeclaration(const std::string& s) const = 0;
-  virtual bool isVirtualFunctionDefinition(const std::string& s) const = 0;
-  virtual bool isClosingClassDefinition(const std::string& s) const = 0;
+  virtual bool IsAdapteeClassDeclaration(const std::string& s) const = 0;
+  virtual bool IsVirtualFunctionDefinition(const std::string& s) const = 0;
+  virtual bool IsClosingClassDefinition(const std::string& s) const = 0;
 
   virtual void startClass(const std::string& s) = 0;
   virtual void addFunctionDeclaration(const std::string& s) = 0;
@@ -49,7 +52,9 @@ protected:
 class /*ADAPTED*/ testAdapterClassesGenerator
 {
 public:
-  virtual testAdapterClass create(const testInterfaceClass&)  const = 0;
+  virtual void createAdapterClass(const testInterfaceClass&) = 0;
+  virtual testAdapterClass GetAdapterClass() const;
+
 };
 
 class /*ADAPTED*/ testAdapterClassesSourceFile
