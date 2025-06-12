@@ -135,7 +135,7 @@ std::string cAddapterCppFunctionDeclarationTransformer::composeDCFB_get() const
   strm << "\"" << className << "." << derived.sName << "\"" << ",obj";
   for (int i = 0; i < derived.parameters.size(); ++i)
     strm << "," << derived.parameters[i].second;
-  strm << ");\n";
+  strm << ");";
 
   return strm.str();
 }
@@ -149,7 +149,7 @@ std::string cAddapterCppFunctionDeclarationTransformer::composeDCFB_set() const
   strm << "\"" << className << "." << derived.sName << "\"" << ",obj";
   for (int i = 0; i < derived.parameters.size(); ++i)
     strm << "," << derived.parameters[i].second;
-  strm << ").Execute();\n";
+  strm << ").Execute();";
   return strm.str();
 }
 

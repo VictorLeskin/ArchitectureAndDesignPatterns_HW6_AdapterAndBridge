@@ -15,6 +15,9 @@ class cGenerateAdapter
 public:
   // return 0  if successful otherwise nonzer and a message
   static std::tuple<int, std::string> main(int argc, const char* argv[]);
+  static std::tuple<int, std::string> main(std::string inputFileName, std::istream& istrm, std::string outputFileName, std::ostream& ostrm);
+
+  static std::string OutputFileName(std::string inputFileName) { return std::string("adapter_") + inputFileName; }
 };
 
 class cInterfaceClass
@@ -89,13 +92,18 @@ protected:
 class cAdapterClassesSourceFile
 {
 public:
-  cAdapterClassesSourceFile(int argc, const char* argv[]);
+  cAdapterClassesSourceFile(std::ostream& s) : strm(s) 
+  {
+    writeHeader();
+  }
 
   void write(const cAdapterClass &);
 
 protected:
-  void open();
   void writeHeader();
+
+protected:
+  std::ostream& strm;
 };
 
 

@@ -29,7 +29,7 @@ struct sDerivedClassFunction : public sParserResult
 	std::string Body() const
 	{
 		return   std::string("{\n")
-				+ std::string("    ") + tBody
+				+ std::string("    ") + tBody + "\n"
 				+ std::string("}\n");
 	}
 };

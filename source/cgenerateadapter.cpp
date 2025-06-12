@@ -5,48 +5,55 @@
 #include <sstream>
 #include <regex>
 
+std::tuple<int, std::string> cGenerateAdapter::main(std::string inputFileName, std::istream& istrm, std::string outputFileName, std::ostream& ostrm)
+{
+    std::string report;
+
+    cInterfaceFileReader ifr(istrm);
+    cAddapterCppFunctionDeclarationTransformer acg;
+    cAdapterClassesSourceFile acsf(ostrm);
+
+    try
+    {
+        ifr.read();
+
+        if (false == ifr.empty())
+        {
+            while (auto iClass = ifr.getClass())
+            {
+                auto ac = acg.createAdapterClass(iClass);
+                acsf.write(*ac);
+
+                // init report string or add comma to separate class names
+                report = (report == "") ? std::string("Generated adapter for classes: ") : (report + ", ");
+                report += iClass->ClassName();
+            }
+        }
+        else
+            return std::tuple(2, "No interface class found.");
+    }
+    catch (const std::exception& expected)
+    {
+        return std::tuple(3, std::string("Something is wrong: ") + expected.what());
+    }
+
+    return std::tuple(0, "");
+}
+
+
 std::tuple<int, std::string> cGenerateAdapter::main(int argc, const char* argv[])
 {
   if (argc != 2)
     return std::tuple(1, "Missed interface header file\nUsage:[interface header file].");
-  
-  std::ifstream strm(argv[1]);
-  std::string report;
 
-  if( false == strm.fail() )
-  {
-    cInterfaceFileReader ifr(strm);
-    cAddapterCppFunctionDeclarationTransformer acg;
-    cAdapterClassesSourceFile acsf(argc, argv);
+  std::ifstream istrm(argv[1]);
+  if (true == istrm.fail())
+      return std::tuple(1, std::string("Can't open input file") + argv[1]);
 
-    try
-    {
-      ifr.read();
+  std::string outputFileName = OutputFileName(argv[1]);
+  std::ofstream ostrm(outputFileName);
 
-      if (false == ifr.empty())
-      {
-        while (auto iClass = ifr.getClass())
-        {
-          auto ac = acg.createAdapterClass(iClass);
-          acsf.write(*ac);
-
-          // init report string or add comma to separate class names
-          report = (report == "") ? std::string("Generated adapter for classes: ") : (report + ", ");
-          report += iClass->ClassName();
-        }
-      }
-      else
-        return std::tuple(2, "No interface class found.");
-    }
-    catch (const std::exception& expected)
-    {
-      return std::tuple(3, std::string( "Something is wrong: ") + expected.what());
-    }
-  }
-  else 
-    return std::tuple(1, std::string( "Can't open input file") + argv[1] );
-    
-  return std::tuple(0,"");
+  return main(argv[1], istrm, outputFileName, ostrm);
 }
 
 void cInterfaceFileReader::read()
@@ -75,14 +82,13 @@ void cInterfaceFileReader::read()
   }
 }
 
-cAdapterClassesSourceFile::cAdapterClassesSourceFile(int argc, const char* argv[])
+void cAdapterClassesSourceFile::write(const cAdapterClass& a)
 {
-  throw std::exception("not imiplemented");
+  strm <<  a.ToStr();
 }
 
-void cAdapterClassesSourceFile::write(const cAdapterClass&)
+void cAdapterClassesSourceFile::writeHeader() 
 {
-  throw std::exception("not imiplemented");
 }
 
 
@@ -144,20 +150,48 @@ cInterfaceClass::cInterfaceClass(const std::string& className, const std::vector
   }
 }
 
+auto replaceAll = [](std::string& str, const std::string& from, const std::string& to) 
+{
+  if (from.empty())
+    return;
+  size_t start_pos = 0;
+  while ((start_pos = str.find(from, start_pos)) != std::string::npos) 
+  {
+    str.replace(start_pos, from.length(), to);
+    start_pos += to.length(); // Move past the replaced part to avoid infinite loops
+  }
+};
+
 std::string cAdapterClass::ToStr() const
 { 
+    const std::string t = R""""(
+// Automatically generated adapter class.
+class $CLASS_NAME$ : protected iAdapterObj, public $INTERFACE_CLASS_NAME$
+{
+public:  	
+  $CLASS_NAME$() : obj(this)
+  {
+  }
+
+$FUNCTIONS$protected:
+  iAdapterObj *obj;  	
+}
+)"""";
+
+    std::string ret(t);
+    replaceAll(ret, "$CLASS_NAME$", className);
+    replaceAll(ret, "$INTERFACE_CLASS_NAME$", interfaceClassName);
+
     std::ostringstream strm;
-    strm << "class " << className << " : public " << interfaceClassName << std::endl;
-    strm << "{" << std::endl;
     for( const auto f: functions )
     {
         strm << "  " << f.sFunctionDeclaration << std::endl;
         strm << "  " << "{" << std::endl;
         strm << "  " << "  " << f.tBody << std::endl;
-        strm << "  " << "}" << std::endl;
+        strm << "  " << "}" << std::endl << std::endl;
     }
-    strm << "}" << std::endl;
 
+    replaceAll(ret, "$FUNCTIONS$", strm.str() );
 
-    return strm.str();
+    return ret;
 }
