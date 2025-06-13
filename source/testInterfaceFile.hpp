@@ -1,3 +1,4 @@
+///************************* OUTS HOMEWORK ****************************************
 #ifndef CGENERATEADAPTER_HPP
 #define CGENERATEADAPTER_HPP
 
@@ -16,7 +17,7 @@ class /*ADAPTED*/ testGenerateAdapter
 {
 public:
   // return 0  if successful otherwise nonzer and a message
-  virtual std::tuple<int, std::string> main(int argc, const char* argv[]) const = 0;
+  virtual std::tuple<int, std::string> main(int argc, const char** argv) const = 0;
 };
 
 class /*ADAPTED*/ testInterfaceClass
@@ -52,7 +53,7 @@ protected:
 class /*ADAPTED*/ testAdapterClassesGenerator
 {
 public:
-  virtual void createAdapterClass(const testInterfaceClass&) = 0;
+  virtual void createAdapterClass(const testInterfaceClass& s) = 0;
   virtual testAdapterClass GetAdapterClass() const;
 
 };
@@ -60,7 +61,7 @@ public:
 class /*ADAPTED*/ testAdapterClassesSourceFile
 {
 public:
-  virtual void write(const testAdapterClass&) = 0;
+  virtual void write(const testAdapterClass& s) = 0;
 
 protected:
   virtual void open() = 0;

@@ -1,9 +1,21 @@
-///************************* ITELMA SP ****************************************
-
+///************************* OUTS HOMEWORK ****************************************
 #include "cgenerateadapter.hpp"
 #include <fstream>
 #include <sstream>
 #include <regex>
+
+static auto replaceAll = [](std::string& str, const std::string& from, const std::string& to) 
+{
+  if (from.empty())
+    return;
+  size_t start_pos = 0;
+  while ((start_pos = str.find(from, start_pos)) != std::string::npos) 
+  {
+    str.replace(start_pos, from.length(), to);
+    start_pos += to.length(); // Move past the replaced part to avoid infinite loops
+  }
+};
+
 
 std::tuple<int, std::string> cGenerateAdapter::main(std::string inputFileName, std::istream& istrm, std::string outputFileName, std::ostream& ostrm)
 {
@@ -11,7 +23,8 @@ std::tuple<int, std::string> cGenerateAdapter::main(std::string inputFileName, s
 
     cInterfaceFileReader ifr(istrm);
     cAddapterCppFunctionDeclarationTransformer acg;
-    cAdapterClassesSourceFile acsf(ostrm);
+    cAdapterClassesSourceFile acsf(inputFileName, outputFileName, ostrm);
+    
 
     try
     {
@@ -19,6 +32,7 @@ std::tuple<int, std::string> cGenerateAdapter::main(std::string inputFileName, s
 
         if (false == ifr.empty())
         {
+            acsf.writeHeader();
             while (auto iClass = ifr.getClass())
             {
                 auto ac = acg.createAdapterClass(iClass);
@@ -28,6 +42,7 @@ std::tuple<int, std::string> cGenerateAdapter::main(std::string inputFileName, s
                 report = (report == "") ? std::string("Generated adapter for classes: ") : (report + ", ");
                 report += iClass->ClassName();
             }
+            acsf.finishFile();
         }
         else
             return std::tuple(2, "No interface class found.");
@@ -89,6 +104,38 @@ void cAdapterClassesSourceFile::write(const cAdapterClass& a)
 
 void cAdapterClassesSourceFile::writeHeader() 
 {
+    const std::string t = R""""(///************************* OUTS HOMEWORK ****************************************
+
+// Automatically generated adapter classes.
+#ifndef $GUARD_DEFINE$
+#define $GUARD_DEFINE$
+
+#include "$BASE_CLASSES_FILE$"
+#include "iAdapterObj.hpp"
+#include "iCommand.hpp"
+#include "cIoC.hpp"
+)"""";
+
+    std::string ret(t);
+    std::string guard = outputFileName;
+    std::transform(guard.begin(), guard.end(), guard.begin(), ::toupper);
+    replaceAll(guard, ".HPP", "_HPP" );
+    replaceAll(ret, "$GUARD_DEFINE$", guard);
+    replaceAll(ret, "$BASE_CLASSES_FILE$", inputFileName);
+    strm << ret;
+}
+
+void cAdapterClassesSourceFile::finishFile()
+{
+    const std::string t = R""""(
+#endif //#ifndef $GUARD_DEFINE$
+)"""";
+
+    std::string ret(t);
+    std::string guard = outputFileName;
+    std::transform(guard.begin(), guard.end(), guard.begin(), ::toupper);
+    replaceAll(ret, "$GUARD_DEFINE$", guard);
+    strm << ret;
 }
 
 
@@ -150,17 +197,6 @@ cInterfaceClass::cInterfaceClass(const std::string& className, const std::vector
   }
 }
 
-auto replaceAll = [](std::string& str, const std::string& from, const std::string& to) 
-{
-  if (from.empty())
-    return;
-  size_t start_pos = 0;
-  while ((start_pos = str.find(from, start_pos)) != std::string::npos) 
-  {
-    str.replace(start_pos, from.length(), to);
-    start_pos += to.length(); // Move past the replaced part to avoid infinite loops
-  }
-};
 
 std::string cAdapterClass::ToStr() const
 { 
@@ -175,7 +211,7 @@ public:
 
 $FUNCTIONS$protected:
   iAdapterObj *obj;  	
-}
+};
 )"""";
 
     std::string ret(t);

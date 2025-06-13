@@ -1,4 +1,4 @@
-///************************* ITELMA SP ****************************************
+///************************* OUTS HOMEWORK ****************************************
 #ifndef CGENERATEADAPTER_HPP
 #define CGENERATEADAPTER_HPP
 
@@ -17,7 +17,7 @@ public:
   static std::tuple<int, std::string> main(int argc, const char* argv[]);
   static std::tuple<int, std::string> main(std::string inputFileName, std::istream& istrm, std::string outputFileName, std::ostream& ostrm);
 
-  static std::string OutputFileName(std::string inputFileName) { return std::string("adapter_") + inputFileName; }
+  static std::string OutputFileName(std::string inputFileName) { return std::string("Adapter_") + inputFileName; }
 };
 
 class cInterfaceClass
@@ -92,17 +92,22 @@ protected:
 class cAdapterClassesSourceFile
 {
 public:
-  cAdapterClassesSourceFile(std::ostream& s) : strm(s) 
+  cAdapterClassesSourceFile(std::string inputFileName, std::string outputFileName, std::ostream& s) : 
+      inputFileName(inputFileName),
+      outputFileName(outputFileName),
+      strm(s)
   {
-    writeHeader();
   }
 
-  void write(const cAdapterClass &);
-
-protected:
   void writeHeader();
+  void write(const cAdapterClass &);
+  void finishFile();
 
 protected:
+
+protected:
+  std::string inputFileName;
+  std::string outputFileName;
   std::ostream& strm;
 };
 

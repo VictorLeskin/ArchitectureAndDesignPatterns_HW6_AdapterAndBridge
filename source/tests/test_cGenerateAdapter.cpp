@@ -1,9 +1,10 @@
-///************************* ITELMA SP ****************************************
+///************************* OUTS HOMEWORK ****************************************
 
 #include <gtest/gtest.h>
 
 #include "cgenerateadapter.hpp"
 #include "ispaceship.hpp"
+#include <fstream>
 
 
 // clang-format off
@@ -22,10 +23,6 @@ public:
 
 };
  
-TEST_F(test_cGenerateAdapter, test_ctor )
-{
-  //Test_cGenerateAdapter t;
-}
 
 
 // gTest grouping class
@@ -61,6 +58,27 @@ public:
   };
 
 };
+
+TEST_F(test_cGenerateAdapter, test_main)
+{
+    const std::string &t0 = test_cInterfaceFileReader::Test_cInterfaceFileReader::testInterfaceFile_hpp;
+
+    Test_cGenerateAdapter t;
+
+    std::istringstream istrm(t0);
+    std::ostringstream ostrm;
+
+    const std::string& t1 = "testInterfaceFile.hpp";
+    std::string t2 = t.OutputFileName(t1);
+
+    auto res = t.main(t1, istrm, t2, ostrm);
+    EXPECT_EQ(0, std::get<0>(res));
+    EXPECT_EQ("", std::get<1>(res));
+
+
+    std::ofstream(t2) << ostrm.str() << std::endl;
+}
+
 
 TEST_F(test_cInterfaceFileReader, test_isAdapteeClassDeclaration)
 {
@@ -202,6 +220,7 @@ TEST_F(test_cInterfaceFileReader, test_getClass)
 
 
 std::string test_cInterfaceFileReader::Test_cInterfaceFileReader::testInterfaceFile_hpp(R""""(
+///************************* OUTS HOMEWORK ****************************************
 #ifndef CGENERATEADAPTER_HPP
 #define CGENERATEADAPTER_HPP
 
@@ -213,11 +232,14 @@ std::string test_cInterfaceFileReader::Test_cInterfaceFileReader::testInterfaceF
 // This class generates adapters from special formatted interface classes.
 // The main function of the class opens a file, looks a interface classes and 
 // generates adapter classes for found interfaces.
+// if class definition contains /*ADAPTED*/ between 'class' and class name this class is adaptee
+// fuction starting with uppercase return part of state of class
+// function starting with lowercase are actor and will be adapted by execution of a command so they return 'void'
 class /*ADAPTED*/ testGenerateAdapter
 {
 public:
   // return 0  if successful otherwise nonzer and a message
-  virtual std::tuple<int, std::string> main(int argc, const char* argv[]) const = 0;
+  virtual std::tuple<int, std::string> main(int argc, const char** argv) const = 0;
 };
 
 class /*ADAPTED*/ testInterfaceClass
@@ -237,13 +259,13 @@ class /*ADAPTED*/ testInterfaceFileReader
 {
   virtual  void read() = 0;
 
-  virtual  bool empty() const = 0;
-  virtual  const testInterfaceClass* getClass() const = 0;
+  virtual  bool IsEmpty() const = 0;
+  virtual  const testInterfaceClass* Class() const = 0;
 
 protected:
-  virtual bool isAdapteeClassDeclaration(const std::string& s) const = 0;
-  virtual bool isVirtualFunctionDefinition(const std::string& s) const = 0;
-  virtual bool isClosingClassDefinition(const std::string& s) const = 0;
+  virtual bool IsAdapteeClassDeclaration(const std::string& s) const = 0;
+  virtual bool IsVirtualFunctionDefinition(const std::string& s) const = 0;
+  virtual bool IsClosingClassDefinition(const std::string& s) const = 0;
 
   virtual void startClass(const std::string& s) = 0;
   virtual void addFunctionDeclaration(const std::string& s) = 0;
@@ -253,13 +275,15 @@ protected:
 class /*ADAPTED*/ testAdapterClassesGenerator
 {
 public:
-  virtual testAdapterClass create(const testInterfaceClass&)  const = 0;
+  virtual void createAdapterClass(const testInterfaceClass& s) = 0;
+  virtual testAdapterClass GetAdapterClass() const;
+
 };
 
 class /*ADAPTED*/ testAdapterClassesSourceFile
 {
 public:
-  virtual void write(const testAdapterClass&) = 0;
+  virtual void write(const testAdapterClass& s) = 0;
 
 protected:
   virtual void open() = 0;
@@ -268,13 +292,3 @@ protected:
 
 #endif //#ifndef CGENERATEADAPTER_HPP
 )"""");
-
-
-
-
-
-
-
-
-
-

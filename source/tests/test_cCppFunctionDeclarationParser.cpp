@@ -1,4 +1,4 @@
-///************************* ITELMA SP ****************************************
+///************************* OUTS HOMEWORK ****************************************
 
 #include <gtest/gtest.h>
 
@@ -203,8 +203,6 @@ TEST_F(test_cAddapterCppFunctionDeclarationTransformer, test_createAdapterClass)
     cInterfaceClass p0(t0, t1);
 
     auto r = t.createAdapterClass(&p0);
-
-    std::ofstream("Adapter")  << r->ToStr() << std::endl;
 }
 
 
@@ -243,7 +241,7 @@ TEST_F(test_cAddapterCppFunctionDeclarationTransformer, test_composeDerivedClass
         t.setClassName("TestClass");
         t.createDCFD(t0.ParseResult());
 
-        std::string resT = R""""(IoC.Resolve<iCommand>("TestClass.setT",obj,s,ptr,d).Execute();)"""";
+        std::string resT = R""""(IoC.Resolve<iCommand *>("TestClass.setT",obj,s,ptr,d)->Execute();)"""";
 
         std::string res0 = t.composeDerivedClassFunctionBody();
 

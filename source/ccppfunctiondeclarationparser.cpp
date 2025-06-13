@@ -1,4 +1,4 @@
-///************************* ITELMA SP ****************************************
+///************************* OUTS HOMEWORK ****************************************
 
 #include "ccppfunctiondeclarationparser.hpp"
 #include "cgenerateadapter.hpp"
@@ -144,12 +144,12 @@ std::string cAddapterCppFunctionDeclarationTransformer::composeDCFB_set() const
 {
   std::ostringstream strm;
 
-  strm << "IoC.Resolve<iCommand>";
+  strm << "IoC.Resolve<iCommand *>";
   strm << "(";
   strm << "\"" << className << "." << derived.sName << "\"" << ",obj";
   for (int i = 0; i < derived.parameters.size(); ++i)
     strm << "," << derived.parameters[i].second;
-  strm << ").Execute();";
+  strm << ")->Execute();";
   return strm.str();
 }
 

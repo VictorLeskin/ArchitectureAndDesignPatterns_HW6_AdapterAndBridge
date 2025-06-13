@@ -1,4 +1,4 @@
-///************************* ITELMA SP ****************************************
+///************************* OUTS HOMEWORK ****************************************
 #ifndef CCPPFUNCTIONDECLARATIONPARSER_HPP
 #define CCPPFUNCTIONDECLARATIONPARSER_HPP
 
