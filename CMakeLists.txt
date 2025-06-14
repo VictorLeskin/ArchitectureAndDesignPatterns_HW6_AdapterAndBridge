@@ -28,8 +28,7 @@ add_executable(
   source/ccppfunctiondeclarationparser.cpp
   source/testInterfaceFile.hpp
   source/Adapter_testInterfaceFile.hpp
-  source/Adapter_testInterfaceFile.cpp
-
+  
   source/tests/test_cCppFunctionDeclarationParser.cpp
   source/tests/test_cGenerateAdapter.cpp
 )

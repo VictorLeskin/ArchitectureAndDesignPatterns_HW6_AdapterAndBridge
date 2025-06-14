@@ -167,4 +167,3 @@ protected:
 };
 
 #endif //#ifndef ADAPTER_TESTINTERFACEFILE.HPP
-

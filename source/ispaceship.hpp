@@ -9,11 +9,11 @@
 // The format is as follows:
 // no double spaces are allowed in gettexcept the start of a line: the penalty is a exception and no generated adapter.
 // class definition should include  /*autoadapted*/  attribute between class and class name like below
-// class /*autoadapted*/ iSpaceship
+// class  /*ADAPTED*/  iSpaceship
 // each virtual function starting by get or set followed uppercase letter will be replaced by 
 // call of 'adapted' function
 
-class /*autoadapted*/ iSpaceship
+class  /*ADAPTED*/  iSpaceship
 {
 public:
   virtual ~iSpaceship() = default;

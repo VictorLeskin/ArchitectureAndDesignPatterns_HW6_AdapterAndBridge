@@ -1,6 +1,6 @@
 ///************************* OUTS HOMEWORK ****************************************
-#ifndef CGENERATEADAPTER_HPP
-#define CGENERATEADAPTER_HPP
+#ifndef TESTINTERFACEFILE_HPP 
+#define TESTINTERFACEFILE_HPP 
 
 #include <tuple>
 #include <string>
@@ -68,4 +68,4 @@ protected:
   virtual void writeHeader() = 0;
 };
 
-#endif //#ifndef CGENERATEADAPTER_HPP
+#endif //#ifndef TESTINTERFACEFILE_HPP 

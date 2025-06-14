@@ -12,7 +12,7 @@ public:
     ~cIoC() = default;
 
     template< typename T, typename... Args>
-    T Resolve(const char *sz, iAdapterObj *obj, Args... args)
+    T Resolve(const char *sz, iAdapterObj *obj, Args & ... args)
     {
     }
 };
