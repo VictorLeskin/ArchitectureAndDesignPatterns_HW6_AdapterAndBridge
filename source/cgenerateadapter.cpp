@@ -173,7 +173,7 @@ void cInterfaceFileReader::startClass(const std::string& s)
   std::regex_match(s, m, r);
 
   if (m.size() != 2)
-    throw(std::exception("Can't get the class name from a class name desription"));
+    throw(cException("Can't get the class name from a class name desription"));
 
   className = m[1];
   virtualFunctions.clear();
