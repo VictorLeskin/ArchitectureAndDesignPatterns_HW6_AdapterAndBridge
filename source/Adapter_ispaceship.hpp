@@ -17,19 +17,19 @@ public:
   {
   }
 
-  const cVector& getPosition()const override
+  const cVector& Position()const override
   {
-    IoC.Resolve<iCommand *>("cAdapter_iSpaceship.getPosition",obj)->Execute();
+    return IoC.Resolve<const cVector&>("cAdapter_iSpaceship.Position",obj);
   }
 
-  const cVector& getVelocity()const override
+  const cVector& Velocity()const override
   {
-    IoC.Resolve<iCommand *>("cAdapter_iSpaceship.getVelocity",obj)->Execute();
+    return IoC.Resolve<const cVector&>("cAdapter_iSpaceship.Velocity",obj);
   }
 
-  std::string getName()const override
+  std::string Name()const override
   {
-    IoC.Resolve<iCommand *>("cAdapter_iSpaceship.getName",obj)->Execute();
+    return IoC.Resolve<std::string>("cAdapter_iSpaceship.Name",obj);
   }
 
   void setPosition(const cVector& pos) override
@@ -51,4 +51,4 @@ protected:
   iAdapterObj *obj;  	
 };
 
-#endif //#ifndef ADAPTER_ISPACESHIP.HPP
+#endif //#ifndef ADAPTER_ISPACESHIP_HPP

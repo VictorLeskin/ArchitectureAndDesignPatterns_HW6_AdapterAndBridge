@@ -166,4 +166,4 @@ protected:
   iAdapterObj *obj;  	
 };
 
-#endif //#ifndef ADAPTER_TESTINTERFACEFILE.HPP
+#endif //#ifndef ADAPTER_TESTINTERFACEFILE_HPP

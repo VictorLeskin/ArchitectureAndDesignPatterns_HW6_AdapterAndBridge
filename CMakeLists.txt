@@ -20,15 +20,22 @@ enable_testing()
 add_executable(
   AdapterAndBridge
 
+  source/ccppfunctiondeclarationparser.cpp
+  source/ccppfunctiondeclarationparser.hpp
   source/cgenerateadapter.cpp
   source/cgenerateadapter.hpp
+
+  source/cIoC.hpp
+  source/cexception.hpp
   source/cvector.hpp
+  source/iAdapterObj.hpp
+  source/iCommand.hpp
+
   source/ispaceship.hpp
-  source/ccppfunctiondeclarationparser.hpp
-  source/ccppfunctiondeclarationparser.cpp
   source/testInterfaceFile.hpp
+  source/Adapter_ispaceship.hpp
   source/Adapter_testInterfaceFile.hpp
-  
+
   source/tests/test_cCppFunctionDeclarationParser.cpp
   source/tests/test_cGenerateAdapter.cpp
 )

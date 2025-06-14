@@ -2,16 +2,18 @@
 #ifndef CCPPFUNCTIONDECLARATIONPARSER_HPP
 #define CCPPFUNCTIONDECLARATIONPARSER_HPP
 
+// classes to parse input header file to the interface class and 
+// transform them to adapter classes.
+
 #include <string>
 #include <vector>
 #include <memory>
 #include "cexception.hpp"
 
-
 class cInterfaceClass;
 class cAdapterClass;
 
-
+// function declarataion parse result.
 struct sParserResult
 {
 	std::string sFunctionDeclaration;
@@ -23,6 +25,7 @@ struct sParserResult
 	std::vector<std::pair<std::string, std::string>> parameters; // тип и имя параметра
 };
 
+// a override function of derived class.
 struct sDerivedClassFunction : public sParserResult
 {
 	std::string tBody;
@@ -34,6 +37,8 @@ struct sDerivedClassFunction : public sParserResult
 	}
 };
 
+// function declaration parser. Not a breacktrougth but quite well parse function in spection fomatat
+// ( starting with 'virtual' and ending by ';' without complex nameas in paramters 
 class cCppFunctionDeclarationParser
 {
 public:
@@ -56,6 +61,8 @@ protected:
 	sParserResult r;
 };
 
+// A class to transform a virtual function of a base class to the override function 
+// of a derived clss. 
 class cAddapterCppFunctionDeclarationTransformer
 {
 public:

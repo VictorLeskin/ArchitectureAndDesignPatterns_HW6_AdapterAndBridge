@@ -20,6 +20,8 @@ public:
   static std::string OutputFileName(std::string inputFileName) { return std::string("Adapter_") + inputFileName; }
 };
 
+
+// input iterface class.
 class cInterfaceClass
 {
 public:
@@ -36,6 +38,7 @@ protected:
   std::vector<sParserResult> functions;
 };
 
+// output iterface class.
 class cAdapterClass
 {
 public:
@@ -43,8 +46,7 @@ public:
     const std::vector<sDerivedClassFunction> &functions ) : interfaceClassName(interfaceClassName), className(className), functions(functions)
   { }
 
-  std::string ToStr() const;
-    
+  std::string ToStr() const; // generate class definition 
 
 protected:
     std::string interfaceClassName;
@@ -52,6 +54,9 @@ protected:
     std::vector<sDerivedClassFunction> functions;
 };
 
+
+// intput file reader. Read file line by line and generate a list of 
+// interface classes in special format.
 class cInterfaceFileReader
 {
 private:
@@ -71,7 +76,7 @@ public:
       : nullptr;
   }
 
-  protected:
+protected:
   bool isAdapteeClassDeclaration( const std::string &s ) const;
   bool isVirtualFunctionDefinition( const std::string &s ) const;
   bool isClosingClassDefinition(const std::string& s) const;
@@ -85,14 +90,16 @@ protected:
   int interfaceClassesIdx = 0;
   std::vector<cInterfaceClass> interfaceClasses;
 
+  // current clas name and functions
   std::string className;
   std::vector<std::string> virtualFunctions;
 };
 
-class cAdapterClassesSourceFile
+// output header file writer. Write header and each class. Finish it by adding closing preprocessor directive
+class cAdapterFileWriter
 {
 public:
-  cAdapterClassesSourceFile(std::string inputFileName, std::string outputFileName, std::ostream& s) : 
+  cAdapterFileWriter(std::string inputFileName, std::string outputFileName, std::ostream& s) :
       inputFileName(inputFileName),
       outputFileName(outputFileName),
       strm(s)
@@ -103,7 +110,7 @@ public:
   void write(const cAdapterClass &);
   void finishFile();
 
-protected:
+  std::string makeGuard() const;
 
 protected:
   std::string inputFileName;

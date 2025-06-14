@@ -23,7 +23,7 @@ std::tuple<int, std::string> cGenerateAdapter::main(std::string inputFileName, s
 
     cInterfaceFileReader ifr(istrm);
     cAddapterCppFunctionDeclarationTransformer acg;
-    cAdapterClassesSourceFile acsf(inputFileName, outputFileName, ostrm);
+    cAdapterFileWriter acsf(inputFileName, outputFileName, ostrm);
     
 
     try
@@ -97,12 +97,12 @@ void cInterfaceFileReader::read()
   }
 }
 
-void cAdapterClassesSourceFile::write(const cAdapterClass& a)
+void cAdapterFileWriter::write(const cAdapterClass& a)
 {
   strm <<  a.ToStr();
 }
 
-void cAdapterClassesSourceFile::writeHeader() 
+void cAdapterFileWriter::writeHeader() 
 {
     const std::string t = R""""(///************************* OUTS HOMEWORK ****************************************
 
@@ -117,24 +117,28 @@ void cAdapterClassesSourceFile::writeHeader()
 )"""";
 
     std::string ret(t);
-    std::string guard = outputFileName;
-    std::transform(guard.begin(), guard.end(), guard.begin(), ::toupper);
-    replaceAll(guard, ".HPP", "_HPP" );
-    replaceAll(ret, "$GUARD_DEFINE$", guard);
+    replaceAll(ret, "$GUARD_DEFINE$", makeGuard());
     replaceAll(ret, "$BASE_CLASSES_FILE$", inputFileName);
     strm << ret;
 }
 
-void cAdapterClassesSourceFile::finishFile()
+std::string cAdapterFileWriter::makeGuard() const
+{
+    std::string guard = outputFileName;
+    std::transform(guard.begin(), guard.end(), guard.begin(), ::toupper);
+    replaceAll(guard, ".HPP", "_HPP");
+    return guard;
+}
+
+
+void cAdapterFileWriter::finishFile()
 {
     const std::string t = R""""(
 #endif //#ifndef $GUARD_DEFINE$
 )"""";
 
     std::string ret(t);
-    std::string guard = outputFileName;
-    std::transform(guard.begin(), guard.end(), guard.begin(), ::toupper);
-    replaceAll(ret, "$GUARD_DEFINE$", guard);
+    replaceAll(ret, "$GUARD_DEFINE$", makeGuard() );
     strm << ret;
 }
 

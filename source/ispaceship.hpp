@@ -4,14 +4,14 @@
 
 #include "cvector.hpp"
 
-// This interface class declaraion have a special format.
-// Main purpose of the format is easy generation a adapter of the class.
-// The format is as follows:
-// no double spaces are allowed in gettexcept the start of a line: the penalty is a exception and no generated adapter.
-// class definition should include  /*autoadapted*/  attribute between class and class name like below
+//The input file with interface classes shold follow a special format.
+//Main purpose of the format is easy generation a adapter of the class.
+//The format is as follows:
+// no double spaces are allowed in function definition except the start of a line: the penalty is a exception and no generated adapter.
+// class definition should include  /*ADAPTED*/  attribute between 'class' and class name like below
 // class  /*ADAPTED*/  iSpaceship
-// each virtual function starting by get or set followed uppercase letter will be replaced by 
-// call of 'adapted' function
+// each virtual function starting by 'virtual' and will be overrided in the derived class.
+// Uppercase letter in name marks getters and lowercases for setters
 
 class  /*ADAPTED*/  iSpaceship
 {
@@ -19,9 +19,9 @@ public:
   virtual ~iSpaceship() = default;
 
   // access
-  virtual const cVector& getPosition() const = 0;
-  virtual const cVector& getVelocity() const = 0;
-  virtual std::string getName() const = 0;
+  virtual const cVector& Position() const = 0;
+  virtual const cVector& Velocity() const = 0;
+  virtual std::string Name() const = 0;
 
   // change
   virtual void setPosition(const cVector& pos) = 0;
